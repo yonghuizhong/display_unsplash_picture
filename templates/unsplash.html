@@ -1,0 +1,76 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>unsplash</title>
+    <link href="{% static 'semantic.css' %}" rel="stylesheet" type="text/css">
+    <script src="{% static 'jquery.js' %}"></script>
+    <script src="{% static 'semantic.js' %}"></script>
+    <script src="{% static 'masonry.pkgd.js' %}"></script>
+    <script src="{% static 'imagesloaded.pkgd.js' %}"></script>
+</head>
+<body>
+<!--顶部搜索栏-->
+<div class="ui fixed menu" style="height: 60px;padding: 10px 10px">
+    <div class="ui right labeled input" style="margin-left: 50px">
+        <div class="ui basic label" style="padding: 4px 4px">
+            <i class="red big pinterest icon"></i>
+        </div>
+        <input type="text" placeholder="Search..." style="background-color: #dfdfdf;min-width: 500px">
+        <div class="ui basic label">
+            <i class="sidebar icon"></i>
+        </div>
+    </div>
+</div>
+<!--卡片组-->
+<div class="ui link cards" style="margin: 65px 0px 30px 50px" id="contentor">
+    {% for image in images %}
+        <div class="card">
+            <a class="image" href="{{ image.url }}" target="_blank">
+                <img src={{ image.url }} alt="error">
+            </a>
+            <div class="extra content">
+                <p><i class="user icon"></i>{{ image.author }}</p>
+                <p>{{ image.time }}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<!--翻页-->
+<div class="ui pagination menu" style="margin: 0px 0px 30px 50px">
+    {% if images.has_previous %}
+        <a class="item" href="?page={{ images.previous_page_number }}"> < pre </a>
+    {% endif %}
+    <div class="disable item">
+        page {{ images.number }} of {{ images.paginator.num_pages }}
+    </div>
+    {% if images.has_next %}
+        <a class="item" href="?page={{ images.next_page_number }}"> next > </a>
+    {% endif %}
+</div>
+<!--实现瀑布流效果-->
+<script>
+    // 未载入的图片可能脱离Masonry布局并导致项元素重叠
+    // 使用imagesloaded解决
+    // 先初始化 masonry
+    var $con = $('#contentor').masonry({
+        itemSelector: '.card',
+        columnWidth: 10
+    });
+    // 然后再每张图片载入后触发layout(布局)
+    $con.imagesLoaded().progress(function () {
+        $con.masonry();
+    });
+    /*
+    var $grid = $('#contentor').imagesLoaded(function () {
+        // init Masonry after all images have loaded
+        $grid.masonry({
+            itemSelector: '.card',
+            columnWidth: 10
+        });
+    });
+    */
+</script>
+</body>
+</html>
